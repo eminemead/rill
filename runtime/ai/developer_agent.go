@@ -96,6 +96,10 @@ func (t *DeveloperAgent) Handler(ctx context.Context, args *DeveloperAgentArgs) 
 			ListTablesName,
 			ShowTableName,
 			QuerySQLName,
+			ListMetricsViewsName,
+			GetMetricsViewName,
+			QueryMetricsViewSummaryName,
+			QueryMetricsViewName,
 			DevelopFileName,
 			NavigateName,
 		},
@@ -158,6 +162,8 @@ The user has configured global additional instructions for you. They may not rel
 
 For context, here are some details about the project's default OLAP connector: {{ .default_olap_info }}.
 Note that you can only use it in model resources if it is not readonly.
+
+If the user is asking a question about existing dashboard or metrics data (rather than asking you to change project files), prefer query_metrics_view / query_metrics_view_summary over raw query_sql. Use query_sql when you need to inspect a table that is not modeled as a metrics view, or when debugging SQL.
 
 Task: {{ .prompt }}
 `, data)
