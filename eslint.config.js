@@ -95,6 +95,12 @@ export default [
     ...tsEslint.configs.disableTypeChecked,
   },
   {
+    // Static assets (e.g. the PWA service worker) are plain browser/worker JS
+    // and are not part of any tsconfig project.
+    files: ["**/static/**/*.js"],
+    ...tsEslint.configs.disableTypeChecked,
+  },
+  {
     files: ["**/*.svelte"],
     rules: {
       // ERRORS
