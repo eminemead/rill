@@ -23,11 +23,15 @@
 
   $: css = theme?.css;
 
-  // Update theme CSS, or clear it when theme is undefined
-  $: if (themeBoundary && styleEl) {
+  $: if (styleEl) {
     // @ts-expect-error - textContent is writable but typed as readonly in some environments
-    styleEl.textContent = css || "";
-    // Clear cached CSS variable lookups so charts re-resolve against the new theme
+    styleEl.textContent = css;
+  }
+
+  // Clear cached CSS variable lookups so charts re-resolve against the new theme
+  $: if (themeBoundary) themeChanged(css);
+
+  function themeChanged(_css: string | undefined) {
     themeManager.clearCSSVariableCache();
   }
 </script>
@@ -38,6 +42,8 @@
   class:size-full={applyLayout && !$dynamicHeight}
   bind:this={themeBoundary}
 >
-  <style bind:this={styleEl}></style>
+  {#if css}
+    <style bind:this={styleEl}></style>
+  {/if}
   <slot />
 </div>
