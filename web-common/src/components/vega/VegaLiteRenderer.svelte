@@ -13,6 +13,7 @@
   import type { Config } from "vega-lite";
   import type { ExpressionFunction, VLTooltipFormatter } from "./types";
   import { createBaseEmbedOptions } from "./vega-embed-options";
+  import { cancelResize, queueResize } from "./resize-queue";
   import { VegaLiteTooltipHandler } from "./vega-tooltip";
   import "./vega.css";
 
@@ -99,6 +100,8 @@
 
   $: if (viewVL && measured) applySize(width, height);
 
+  const resizeOwner = {};
+
   function applySize(w: number, h: number) {
     // svelte-vega still re-embeds from `options` whenever the spec changes, so its size fields
     // have to stay current or the chart re-embeds at the size it had when `options` was last
@@ -110,9 +113,12 @@
 
     // Resize the existing view in place. vega-embed applies `options.width`/`height` the same
     // way, so this matches the initial embed. Setting an unchanged size is a no-op for Vega.
-    viewVL.width(w);
-    viewVL.height(h);
-    void viewVL.runAsync();
+    const target = viewVL;
+    queueResize(resizeOwner, () => {
+      target.width(w);
+      target.height(h);
+      void target.runAsync();
+    });
   }
 
   // Create a more efficient key for component remounting
@@ -132,6 +138,7 @@
   };
 
   onDestroy(() => {
+    cancelResize(resizeOwner);
     if (tooltipHandler) {
       tooltipHandler.destroy();
       tooltipHandler = null;
